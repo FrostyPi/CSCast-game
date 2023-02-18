@@ -1,0 +1,18 @@
+1. Figure out groups with respect to adding entities to em to draw all entities at once in main
+2. work out centered character for player,
+3. create world larger than display (might have to come before 3, find out)
+DONE
+
+0. fix angle of line DONE
+
+1. Collisions DONE
+2. Raycasting amendments with new layout done
+	bug to do with sprite alignment with tile layout/player position donezos?m aybe? done
+
+3. Bullets done just need collisions, and they currently show beneath the cast rays
+4. implement sprite rotation w/ respect to mouse pos
+ 
+
+next
+1. 
+4. other steps.
