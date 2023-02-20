@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
 
         #attack stuff
         self.attack_state = False 
-        self. attack_cooldown = 200
+        self.attack_cooldown = 200
         self.attack_time = None
 
         #level stuff
@@ -72,7 +72,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def spawn_attack(self):
-        Bullet(self, [self.game.visible_sprites, self.game.attack_group], self.game.enemy_sprites, self.game.obstacle_sprites)
+        Bullet(self, [self.game.visible_sprites, self.game.attack_sprites], self.game.enemy_sprites, self.game.obstacle_sprites)
 
     def cooldowns(self):
         current_time = pygame.time.get_ticks()

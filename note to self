@@ -14,10 +14,11 @@ DONE
  
 
 next 20/02/2023
-1. Enemy pathfinding
+0. collisions with bullets/between enemies DONE
+1. Enemy pathfinding - DO LATER
 2. Player/Enemy sprites
 3. Weapon functionality
-	- NERF gun
+	- NERF gun -DONE 
 	- portable speaker that plays Mr. Brightside
 4. Weapon sprites
 5. Level design

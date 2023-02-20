@@ -19,7 +19,7 @@ class Enemy(pygame.sprite.Sprite):
         self.force = 0.5
         #movement
         self.direction = None
-        self.move_state = 'idle'
+        self.move_state = 'moving'
         self.distance = 0
 
         self.obstacle_sprites = obstacles
@@ -33,27 +33,38 @@ class Enemy(pygame.sprite.Sprite):
 
     def movement(self):
         self.enemy_vector = pygame.math.Vector2(self.rect.center)
-        # if self.move_state == 'moving':
+        #if self.move_state == 'moving':
         player_vector = pygame.math.Vector2(self.game.player.rect.center)
         difference_vector = (player_vector - self.enemy_vector)
         self.distance = difference_vector.magnitude()
         if self.distance != 0:
             self.direction = difference_vector.normalize()
 
-        self.dx, self.dy = 0, 0
+        if self.move_state == 'knocked':
+            self.knockback_vector = self.enemy_vector - self.bullet_vector
+            self.distance = self.knockback_vector.magnitude()
+            if self.distance != 0:
+                self.direction = self.knockback_vector.normalize()
 
-        # angle_to_player = math.atan2(self.game.player.rect.y - self.rect.y, self.game.player.rect.x - self.rect.x)
-        # angle_to_player = math.degrees(angle_to_player)
 
-        self.move_state = 'moving'
+        if self.move_state == 'moving':
+            self.rect.x = self.rect.x + self.direction.x * self.speed
+            self.collisions('horizontal')
+            self.rect.y = self.rect.y + self.direction.y * self.speed
+            self.collisions('vertical')
 
-        self.rect.x = self.rect.x + self.direction.x * self.speed
-        self.collisions('horizontal')
-        self.rect.y = self.rect.y + self.direction.y * self.speed
-        self.collisions('vertical')
+        elif self.move_state == 'knocked':
+            self.rect.x = self.rect.x + self.direction.x * self.force
+            self.collisions('horizontal')
+            self.rect.y = self.rect.y + self.direction.y * self.force
+            self.collisions('vertical')
 
-        # elif self.move_state == 'knocked':
-        #     self.apply_knockback()
+
+        #bullet mechanics
+        if self.force > 0:
+            self.force -= 1
+        else:
+            self.move_state = 'moving'
 
         self.hitbox.x = self.rect.x
         self.hitbox.y = self.rect.y
@@ -61,7 +72,6 @@ class Enemy(pygame.sprite.Sprite):
         self.x = self.rect.x / TILE_SIZE
         self.y = self.rect.y / TILE_SIZE
         
-
         
     def get_state(self, knocked = False):
         #temporary aggro solution
@@ -72,20 +82,11 @@ class Enemy(pygame.sprite.Sprite):
             else: 
                 self.move_state = 'idle'
     
-    # def apply_knockback(self):
-    #     # self.knockback_vector = self.enemy_vector - self.bullet_vector
-    #     self.distance = self.knockback_vector.magnitude()
-    #     if self.distance != 0:
-    #         self.direction = self.knockback_vector.normalize()
+    def apply_knockback(self, bullet_vector):
+        self.move_state = 'knocked'
+        self.bullet_vector = bullet_vector
+        self.force = 10
 
-    #     if self.force < 20:
-    #         self.rect.x = self.rect.x + self.direction.x / self.force
-    #     else:
-    #         self.rect.x = self.rect.x
-    #         self.force = 0.5
-    #         self.move_state = 'idle'
-
-    #     self.force += 1
 
 
     def collisions(self, direction):
@@ -93,18 +94,55 @@ class Enemy(pygame.sprite.Sprite):
         if direction == 'vertical':
             for sprite in self.obstacle_sprites:
                 if self.rect.colliderect(sprite.rect):
-                    if self.dy < 0: # up
+                    if self.direction.y < 0: # up
                         self.rect.top = sprite.rect.bottom
-                    elif self.dy > 0: # down
+                    elif self.direction.y > 0: # down
                         self.rect.bottom = sprite.rect.top
+
+            for sprite in self.game.enemy_sprites:
+                if sprite != self:
+                    if self.rect.colliderect(sprite.rect):
+                        if self.direction.y < 0: # up
+                            self.rect.top = sprite.rect.bottom
+                        elif self.direction.y > 0: # down
+                            self.rect.bottom = sprite.rect.top
+                elif sprite == self:
+                    pass
+            
         # horizontal collisions               
         if direction == 'horizontal':
             for sprite in self.obstacle_sprites:
                 if self.rect.colliderect(sprite.rect):
-                    if self.dx < 0: # left
+                    if self.direction.x < 0: # left
                         self.rect.left = sprite.rect.right
-                    elif self.dx > 0: # right
+                    elif self.direction.x > 0: # right
                         self.rect.right = sprite.rect.left
+
+            for sprite in self.game.enemy_sprites:
+                if sprite != self:
+                    if self.rect.colliderect(sprite.rect):
+                        if self.direction.x < 0: # up
+                            self.rect.left = sprite.rect.right
+                        elif self.direction.x > 0: # down
+                            self.rect.right = sprite.rect.left
+                elif sprite == self:
+                    pass
+
+                    
+        #bullet collision
+        if self.game.attack_sprites:
+            for attack_sprite in self.game.attack_sprites:
+                collided_enemy_sprites = pygame.sprite.spritecollide(attack_sprite, self.game.enemy_sprites, False)
+                if collided_enemy_sprites:
+                    attack_sprite.kill()
+                    for target_sprite in collided_enemy_sprites:
+                        target_sprite.apply_knockback(attack_sprite.bullet_vector)
+
+        #enemy-enemy collision
+        
+
+
+        #need other enemy and bullet collisions
 
         # for sprite in self.incoming_attacks:
         #         if self.hitbox.colliderect(sprite.rect):
@@ -120,6 +158,10 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         #self.masking()
         self.movement()
+        #self.collisions('horizontal')
+        self.collisions('vertical')
+        
+
     
 
     @property

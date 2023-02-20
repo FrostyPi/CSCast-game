@@ -7,7 +7,7 @@ HALF_HEIGHT = HEIGHT / 2
 FPS = 80
 TILE_SIZE = 64
 
-FOV = math.pi / 3
+FOV = math.pi / 3   # perhaps upgradable?
 HALF_FOV = FOV / 2
 
 RAY_COUNT = WIDTH // 8   #default was // 2
