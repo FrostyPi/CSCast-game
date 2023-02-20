@@ -1,10 +1,12 @@
 import sys
 import pygame
+from pytmx.util_pygame import load_pygame
 from player import *
 from config import *
 from level import *
 from raycast import *
 from camera import *
+from enemy import *
 
 class Game:
     def __init__(self):
@@ -13,21 +15,39 @@ class Game:
         self.clock = pygame.time.Clock()
         self.time_between_frames = 0
         pygame.mouse.set_cursor(pygame.cursors.broken_x)
-
+        #need a thing here for both zones with tmx_data
+        #self.zone = 'upper'
+        self.tmx_data = load_pygame('graphics/tiled_map/tiledmap.tmx')
+        self.game_state = 'new game'
         self.new_game()
 
 
     def new_game(self):
-        self.visible_sprites = YCameraGroup()
+        self.display_surf = pygame.display.get_surface()
+        self.camera_set = pygame.math.Vector2(100, 200)
+        self.floor_surf = pygame.image.load('graphics/tiled_map/tiledmap.png')#(#pygame.Surface((5632, 5632))
+        #self.floor_surf.fill('black')  
+        self.floor_rect = self.floor_surf.get_rect(topleft = (0, 0))    #image.load('graphics/map.png').convert() #self.floor_surf = pygame.image.load('graphics/ground.png').convert()
+        #self.floor_mask = pygame.mask.from_surface(self.floor_surf)
+
+        # self.darkness_surf = pygame.Surface((5632, 5632), pygame.SRCALPHA, 32)
+        # self.darkness_surf.fill('black')
+        # self.darkness_mask = pygame.mask.from_surface(self.darkness_surf)
+
+        self.visible_sprites = YCameraGroup(self)
         self.obstacle_sprites = pygame.sprite.Group()
+        self.enemy_sprites = pygame.sprite.Group()
+        self.attack_group = pygame.sprite.Group()
 
         self.map = Map(self)
-        self.player = Player(self, [self.visible_sprites], self.obstacle_sprites) #Player(self)
+        
+        self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, self.attack_group, (40, 40))
+        self.player = Player(self, [self.visible_sprites], self.obstacle_sprites, self.enemy_sprites, (30, 30)) #Player(self)
         self.raycast = RayCast(self)
     
     def event_loop(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT: # or self.game_state == 'game over':
                 pygame.quit()
                 sys.exit()
 
@@ -50,7 +70,7 @@ class Game:
         #self.player.draw()
 
     def run(self):
-        while True:
+        while True and self.game_state != 'game over':
             self.event_loop()
             self.draw()
             self.update()
