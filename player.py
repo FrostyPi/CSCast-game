@@ -28,6 +28,9 @@ class Player(pygame.sprite.Sprite):
         self.ps_level = 1
         self.bullet_level = 1
 
+        #speaker possession
+        self.speaker_possession = True
+
     def movement(self):
         
         speed = 5#self.game.time_between_frames
@@ -68,11 +71,17 @@ class Player(pygame.sprite.Sprite):
             self.attack_state = True
             self.attack_time = pygame.time.get_ticks()
             self.spawn_attack()
-            print('nice')
+
+        if mouse[2] and self.speaker_possession:
+            self.spawn_speaker()
+            self.speaker_possession = False
 
 
     def spawn_attack(self):
-        Bullet(self, [self.game.visible_sprites, self.game.attack_sprites], self.game.enemy_sprites, self.game.obstacle_sprites)
+        Bullet(self, [self.game.visible_sprites, self.game.attack_sprites], self.game.obstacle_sprites)
+
+    def spawn_speaker(self):
+        self.speaker = PortableSpeaker(self, [self.game.visible_sprites, self.game.speaker_sprite])
 
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
@@ -115,6 +124,14 @@ class Player(pygame.sprite.Sprite):
             #     #gameover
             #     pass
 
+    def item_pickup_events(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_e]:
+            if self.speaker_possession == False:
+                for sprite in self.game.speaker_sprite:
+                    if self.rect.colliderect(sprite.rect):
+                        sprite.kill()
+                        self.speaker_possession = True
 
     
     def update(self):
@@ -122,6 +139,7 @@ class Player(pygame.sprite.Sprite):
         self.movement()
         self.mouse_inputs()
         self.cooldowns()
+        self.item_pickup_events()
         #print('x')
 
     @property

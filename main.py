@@ -39,10 +39,12 @@ class Game:
         self.enemy_sprites = pygame.sprite.Group()
         self.attack_sprites = pygame.sprite.Group()
 
+        self.speaker_sprite = pygame.sprite.GroupSingle()
+
         self.map = Map(self)
         
-        self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, self.attack_sprites, (25, 25))
-        self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, self.attack_sprites, (20, 20))
+        self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (25, 25))
+        self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (20, 20))
         self.player = Player(self, [self.visible_sprites], self.obstacle_sprites, self.enemy_sprites, (30, 30)) #Player(self)
         self.raycast = RayCast(self)
     

@@ -4,7 +4,7 @@ import math
 from Bullets import *
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, game, groups, obstacles, incoming_attack_group, spawn_pos):
+    def __init__(self, game, groups, obstacles, spawn_pos):
         super().__init__(groups)
         self.game = game
 
@@ -23,7 +23,6 @@ class Enemy(pygame.sprite.Sprite):
         self.distance = 0
 
         self.obstacle_sprites = obstacles
-        self.incoming_attacks = incoming_attack_group
 
         #attack stuff
         self.trigger_radius = 400
@@ -39,15 +38,20 @@ class Enemy(pygame.sprite.Sprite):
         self.distance = difference_vector.magnitude()
         if self.distance != 0:
             self.direction = difference_vector.normalize()
+        
 
         if self.move_state == 'knocked':
             self.knockback_vector = self.enemy_vector - self.bullet_vector
             self.distance = self.knockback_vector.magnitude()
             if self.distance != 0:
                 self.direction = self.knockback_vector.normalize()
+        elif self.move_state == 'seeking vibes':
+            difference_vector = self.speaker_difference
+            if self.speaker_distance != 0:
+                self.direction = difference_vector.normalize()
 
 
-        if self.move_state == 'moving':
+        if self.move_state == 'moving' or self.move_state == 'seeking vibes':
             self.rect.x = self.rect.x + self.direction.x * self.speed
             self.collisions('horizontal')
             self.rect.y = self.rect.y + self.direction.y * self.speed
@@ -59,7 +63,7 @@ class Enemy(pygame.sprite.Sprite):
             self.rect.y = self.rect.y + self.direction.y * self.force
             self.collisions('vertical')
 
-
+        self.collisions('bullet')
         #bullet mechanics
         if self.force > 0:
             self.force -= 1
@@ -72,21 +76,34 @@ class Enemy(pygame.sprite.Sprite):
         self.x = self.rect.x / TILE_SIZE
         self.y = self.rect.y / TILE_SIZE
         
-        
-    def get_state(self, knocked = False):
-        #temporary aggro solution
-        distance = math.hypot(self.game.player.rect.x - self.rect.x, self.game.player.rect.y - self.rect.y)
-        if self.move_state != 'knocked':
-            if distance <= self.trigger_radius :
-                self.move_state = 'moving'
-            else: 
-                self.move_state = 'idle'
+    def speaker_check(self):
+        if self.game.speaker_sprite:
+            for sprite in self.game.speaker_sprite:
+                self.speaker_difference = pygame.math.Vector2(sprite.rect.x - self.rect.x, sprite.rect.y - self.rect.y)
+                self.speaker_distance = self.speaker_difference.magnitude()
+
+                if (self.speaker_distance < sprite.effect_radius) and (self.speaker_distance > sprite.vibe_radius) and self.move_state != 'knocked':
+                    self.move_state = 'seeking vibes'
+
+                elif self.speaker_distance <= sprite.vibe_radius and self.move_state != 'knocked':
+                    self.move_state = 'vibing'
+                elif self.move_state != 'knocked':
+                    self.move_state = 'moving'
+
+
+    # def get_state(self, knocked = False):
+    #     #temporary aggro solution
+    #     distance = math.hypot(self.game.player.rect.x - self.rect.x, self.game.player.rect.y - self.rect.y)
+    #     if self.move_state != 'knocked':
+    #         if distance <= self.trigger_radius :
+    #             self.move_state = 'moving'
+    #         else: 
+    #             self.move_state = 'idle'
     
     def apply_knockback(self, bullet_vector):
         self.move_state = 'knocked'
         self.bullet_vector = bullet_vector
         self.force = 10
-
 
 
     def collisions(self, direction):
@@ -128,26 +145,16 @@ class Enemy(pygame.sprite.Sprite):
                 elif sprite == self:
                     pass
 
-                    
         #bullet collision
-        if self.game.attack_sprites:
-            for attack_sprite in self.game.attack_sprites:
-                collided_enemy_sprites = pygame.sprite.spritecollide(attack_sprite, self.game.enemy_sprites, False)
-                if collided_enemy_sprites:
-                    attack_sprite.kill()
-                    for target_sprite in collided_enemy_sprites:
-                        target_sprite.apply_knockback(attack_sprite.bullet_vector)
+        if direction == 'bullet':
+            if self.game.attack_sprites:
+                for attack_sprite in self.game.attack_sprites:
+                    collided_enemy_sprites = pygame.sprite.spritecollide(attack_sprite, self.game.enemy_sprites, False)
+                    if collided_enemy_sprites:
+                        attack_sprite.kill()
+                        for target_sprite in collided_enemy_sprites:
+                            target_sprite.apply_knockback(attack_sprite.bullet_vector)
 
-        #enemy-enemy collision
-        
-
-
-        #need other enemy and bullet collisions
-
-        # for sprite in self.incoming_attacks:
-        #         if self.hitbox.colliderect(sprite.rect):
-        #             self.move_state = 'knocked'
-        #             self.knockback_vector = self.enemy_vector - sprite.bullet_vector
 
     # def masking(self):         #for optimisation, so masks arent always generated DOEsnt work lomao
     #     if self.distance >= VISION_RANGE:
@@ -158,8 +165,7 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         #self.masking()
         self.movement()
-        #self.collisions('horizontal')
-        self.collisions('vertical')
+        self.speaker_check()
         
 
     

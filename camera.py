@@ -41,6 +41,27 @@ class YCameraGroup(pygame.sprite.Group):
                     self.display_surf.blit(sprite.image, camera_set_pos)
                 else:
                     pass #self.display_surf.blit(sprite.image, camera_set_pos)
+            elif "Portable" in str(sprite):
+                camera_set_pos = sprite.rect.topleft - self.camera_set
+
+                # circle_surface = pygame.Surface((sprite.effect_radius*2, sprite.effect_radius*2)).convert_alpha()
+                # circle_surface.fill((0, 0, 0, 0))
+                
+                #pygame.draw.circle(circle_surface, 'green', camera_set_pos, sprite.effect_radius)
+                self.display_surf.blit(sprite.image, camera_set_pos)
+               # self.display_surf.blit(circle_surface, (camera_set_pos[0] - sprite.effect_radius, camera_set_pos[1] - sprite.effect_radius))
+                #print('true')
             else: 
                 camera_set_pos = sprite.rect.topleft - self.camera_set         #if you sprite.rect.topleft player is centered properly, but not tiles. if use sprite.rect.center, tile sprites are centered instead
                 self.display_surf.blit(sprite.image, camera_set_pos)
+
+    # def draw_transparent_circle(self, surface, color, points):
+    #     lx, ly = zip(*points)
+    #     min_x, min_y, max_x, max_y = min(lx), min(ly), max(lx), max(ly)
+    #     self.rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
+    #     self.image = pygame.Surface(self.rect.size, pygame.SRCALPHA, 32)
+    #     self.image.convert_alpha()
+
+    #     pygame.draw.polygon(self.image, color, [(x - min_x, y - min_y) for x, y in points])
+    #     mouse = pygame.mouse.get_pressed(num_buttons=3)
+    #     self.mask = pygame.mask.from_surface(self.image)
