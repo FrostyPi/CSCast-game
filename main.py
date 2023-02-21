@@ -7,6 +7,13 @@ from level import *
 from raycast import *
 from camera import *
 from enemy import *
+from loot import *
+
+# class GameState():
+#     def __init__(self):
+#         self.state = 'main_game'
+    
+#     def main_game()
 
 class Game:
     def __init__(self):
@@ -17,36 +24,97 @@ class Game:
         pygame.mouse.set_cursor(pygame.cursors.broken_x)
         #need a thing here for both zones with tmx_data
         #self.zone = 'upper'
-        self.tmx_data = load_pygame('graphics/tiled_map/tiledmap.tmx')
         self.game_state = 'new game'
+        self.stage = "floor-one"
+        #self.tmx_data = load_pygame(f'graphics/tiled_map/{self.stage}.tmx')
+        
+
         self.new_game()
+
 
 
     def new_game(self):
         self.display_surf = pygame.display.get_surface()
         self.camera_set = pygame.math.Vector2(100, 200)
-        self.floor_surf = pygame.image.load('graphics/tiled_map/tiledmap.png')#(#pygame.Surface((5632, 5632))
-        #self.floor_surf.fill('black')  
-        self.floor_rect = self.floor_surf.get_rect(topleft = (0, 0))    #image.load('graphics/map.png').convert() #self.floor_surf = pygame.image.load('graphics/ground.png').convert()
-        #self.floor_mask = pygame.mask.from_surface(self.floor_surf)
+        self.floor_surf = pygame.image.load('graphics/tiled_map/floor-one.png')
 
-        # self.darkness_surf = pygame.Surface((5632, 5632), pygame.SRCALPHA, 32)
-        # self.darkness_surf.fill('black')
-        # self.darkness_mask = pygame.mask.from_surface(self.darkness_surf)
+        self.floor_rect = self.floor_surf.get_rect(topleft = (0, 0)) 
 
         self.visible_sprites = YCameraGroup(self)
         self.obstacle_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
         self.attack_sprites = pygame.sprite.Group()
 
-        self.speaker_sprite = pygame.sprite.GroupSingle()
+        self.upgrade_sprites = pygame.sprite.Group() # neeed to put into rewsrt_levle?
 
+        self.door_sprites = pygame.sprite.Group()
+
+        self.speaker_sprite = pygame.sprite.GroupSingle()
+        self.tmx_data = load_pygame('graphics/tiled_map/floor-one.tmx')
         self.map = Map(self)
         
-        self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (25, 25))
-        self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (20, 20))
-        self.player = Player(self, [self.visible_sprites], self.obstacle_sprites, self.enemy_sprites, (30, 30)) #Player(self)
+        self.inventory = []
+        self.keys = []
+
+        self.generate_level_one((11.5, 17))
+        
+
+    def reset_level(self): 
+        self.visible_sprites.empty()
+        self.obstacle_sprites.empty()
+        self.enemy_sprites.empty()
+        self.attack_sprites.empty()
+        self.door_sprites.empty()
+        self.speaker_sprite.empty()
+        
+
+
+    def generate_level_one(self, spawn_position):
+        self.floor_surf = pygame.image.load('graphics/tiled_map/floor-one.png')
+
+        self.floor_rect = self.floor_surf.get_rect(topleft = (0, 0)) 
+        self.visible_sprites.floor_surf = self.floor_surf
+        self.visible_sprites.floor_rect = self.floor_rect
+        self.tmx_data = load_pygame('graphics/tiled_map/floor-one.tmx')
+
+        self.map = Map(self)
+        self.player = Player(self, [self.visible_sprites], self.obstacle_sprites, self.enemy_sprites, spawn_position, self.inventory, self.keys)
         self.raycast = RayCast(self)
+        print(self.inventory)
+
+    def generate_level_two(self):
+        self.floor_surf = pygame.image.load('graphics/tiled_map/floor-two.png')
+
+        self.floor_rect = self.floor_surf.get_rect(topleft = (0, 0)) 
+        self.visible_sprites.floor_surf = self.floor_surf
+        self.visible_sprites.floor_rect = self.floor_rect
+        self.tmx_data = load_pygame('graphics/tiled_map/floor-two.tmx')
+        self.map = Map(self)
+
+        # self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (0, 0))
+        # self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (0, 0))
+        if "speaker" not in self.inventory:
+            self.speaker_item = Item([self.visible_sprites, self.upgrade_sprites], "speaker", (2, 50))
+        if "flashlight upgrade" not in self.inventory:
+            self.flashlight_upgrade_item = Item([self.visible_sprites, self.upgrade_sprites], "flashlight-upgrade", (29, 25))
+        if "speaker upgrade" not in self.inventory:
+            self.speaker_upgrade_item = Item([self.visible_sprites, self.upgrade_sprites], "speaker-upgrade", (5, 37))
+        if "gun upgrade" not in self.inventory:
+            self.gun_upgrade_item = Item([self.visible_sprites, self.upgrade_sprites], "gun-upgrade", (28, 7))
+        
+        #key check
+        if "lecture room" not in self.keys:
+            self.lecture_room_key = Item([self.visible_sprites, self.upgrade_sprites], "keycard", (28, 32))
+        if "right corridor" not in self.keys:
+            self.right_corridor_key = Item([self.visible_sprites, self.upgrade_sprites], "keycard", (27, 4))
+        if "MCS0001" not in self.keys:
+            self.final_key = Item([self.visible_sprites, self.upgrade_sprites], "keycard", (1.8, 25))
+#
+        self.player = Player(self, [self.visible_sprites], self.obstacle_sprites, self.enemy_sprites, (19, 40), self.inventory, self.keys)
+        self.raycast = RayCast(self)
+        #print(self.inventory)
+
+    
     
     def event_loop(self):
         for event in pygame.event.get():
@@ -66,14 +134,21 @@ class Game:
 
     def draw(self):
         self.screen.fill('black')
-        # self.map.draw()
         self.visible_sprites.new_draw(self.player)
-        #for i in 
-    
-        #self.player.draw()
 
     def run(self):
         while True and self.game_state != 'game over':
+            if self.stage == "floor-one" and self.player.rect.x > 760 and self.player.rect.y < 70:
+                self.reset_level()
+                self.stage = "floor-two"
+                self.generate_level_two()
+
+            elif self.stage == "floor-two" and 1120 <= self.player.rect.x <= 1248 and 2816 >= self.player.rect.y >= 2600 :
+                self.reset_level()
+                self.stage = "floor-one"
+                self.generate_level_one((14, 2))
+
+            #print(self.player.x, self.player.y)
             self.event_loop()
             self.draw()
             self.update()

@@ -16,13 +16,21 @@ DONE
 next 20/02/2023
 0. collisions with bullets/between enemies DONE
 1. Enemy pathfinding - DO LATER
-2. Player/Enemy sprites
 3. Weapon functionality
 	- NERF gun -DONE 
-	- portable speaker that plays Mr. Brightside
-4. Weapon sprites
-5. Level design
-6. Sounds
+	- portable speaker that plays Mr. Brightside DONE
+
+
+NOW: 
+6. ROTATE SPRITES
+6. doors
+6. NPCs
+6. Keys
+7. Level design
+- ENEMY AGGRO AREA
+4. Player DONE/Enemy DONE/NPC/Door/Key/Speaker DONE/Bullet sprites
+4
+6. BGM
 7. Menus
 
 8. other steps.

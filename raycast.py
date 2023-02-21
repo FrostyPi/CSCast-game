@@ -10,14 +10,20 @@ class RayCast(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 
+        #self.flash_light_type = 3
+        self.fov = math.pi / 3
+        self.half_fov = self.fov / 2
+        self.d_angle = self.fov / RAY_COUNT
+        self.vision_range_arc = VISION_RANGE_ARC
+
     def ray_cast(self):
         x_player, y_player = self.game.player.position
         x_player_tile, y_player_tile = self.game.player.tile_position
-        ray_angle = self.game.player.angle - HALF_FOV + 0.00001
+        ray_angle = self.game.player.angle - self.half_fov + 0.00001
 
         list_of_intersections = [[HALF_WIDTH, HALF_HEIGHT]]
         for ray in range(RAY_COUNT):
-            ray_angle = ray_angle + d_ANGLE
+            ray_angle = ray_angle + self.d_angle
             self.cos_a = math.cos(ray_angle)
             self.sin_a = math.sin(ray_angle)
 
@@ -68,20 +74,19 @@ class RayCast(pygame.sprite.Sprite):
                 length_horizontal = length_horizontal + d_length_h
             
 
-            if length_vert >= length_horizontal and length_horizontal < VISION_RANGE_ARC:
+            if length_vert >= length_horizontal and length_horizontal < self.vision_range_arc:
                 self.length = length_horizontal
-            elif length_vert < length_horizontal and length_vert < VISION_RANGE_ARC:
+            elif length_vert < length_horizontal and length_vert < self.vision_range_arc:
                 self.length = length_vert
             else:
-                self.length = VISION_RANGE_ARC
+                self.length = self.vision_range_arc
 
+            #vertices for polygon, could probably be optimised
             list_of_intersections.append([HALF_WIDTH + TILE_SIZE*self.length*self.cos_a, HALF_HEIGHT + TILE_SIZE *self.length*self.sin_a])
-            #draw test
-            # pygame.draw.line(self.game.screen, 'yellow', (HALF_WIDTH, HALF_HEIGHT),
-            #                             (HALF_WIDTH + TILE_SIZE*self.length*self.cos_a, HALF_HEIGHT + TILE_SIZE *self.length*self.sin_a), 2)
-        self.draw_polygon_alpha(self.game.display_surf, (200, 200, 174, 128), list_of_intersections)   # this could definitely be optimised
-        #self.game.screen
-        #print(self.rect)
+        
+        # draw polygon as surface, with mask for enemy detection
+        self.draw_polygon_alpha(self.game.display_surf, (200, 200, 174, 128), list_of_intersections)
+
     
     def draw_polygon_alpha(self, surface, color, points):
         lx, ly = zip(*points)
@@ -93,38 +98,12 @@ class RayCast(pygame.sprite.Sprite):
         pygame.draw.polygon(self.image, color, [(x - min_x, y - min_y) for x, y in points])
         mouse = pygame.mouse.get_pressed(num_buttons=3)
         self.mask = pygame.mask.from_surface(self.image)
-        # self.offset_x = self.game.enemy.rect.left - self.rect.left
-        # self.offset_y = self.game.enemy.rect.right - self.rect.right
-
-
-        # if self.game.enemy.mask.overlap_area(self.mask, (self.offset_x, self.offset_y)):
-        #     print('wow')
-        #print(self.game.enemy.rect.x, self.game.enemy.rect.y)
-        #print(self.rect.x, self.rect.y)
-        #if not mouse[2]:
         surface.blit(self.image, self.rect)
-        # else:
-        #     surface.blit(self.mask.to_surface(unsetcolor=(255, 255, 255, 255), setcolor= (0, 0, 0, 0)), self.rect)
-        #     surface.blit(self.game.enemy.mask.to_surface(unsetcolor=(255, 255, 255, 255), setcolor= (0, 0, 0, 0)), self.game.enemy.rect)
-
-        #new_mask = self.mask.overlap_mask(self.game.darkness_mask, (offset_x, offset_y))
-        # new_mask = self.game.darkness_mask.overlap_mask(self.mask, (offset_x, offset_y))
-        # new_surf = new_mask.to_surface(unsetcolor=(255, 255, 255, 255), setcolor= (0, 0, 0, 0))
-        # new_surf.set_colorkey((0,0,0))
-        #surface.blit(new_surf, self.game.floor_rect)
-        # new_mask = self.game.floor_mask.overlap_mask(self.mask, (offset_x, offset_y))
-        # new_mask.invert()
-        #new_surf = new_mask.to_surface()
-        #surface.blit(new_surf, self.game.floor_rect)
-        #new_surf.set_colorkey((0, 0, 0))        
-        #surface.blit(new_surf, self.rect)
-        #self.game.floor_mask
-        # if not mouse[2]:
-        #     surface.blit(self.image, self.rect)
-        # else:
-        #     surface.blit(self.mask.to_surface(unsetcolor=(255, 255, 255, 255), setcolor= (0, 0, 0, 0)), self.rect)
-
-
+       
     def update (self):
         self.ray_cast()
-        
+        if self.game.player.flashlight_upgrade == True:
+            self.fov = math.pi / 1.5
+            self.half_fov = self.fov / 2
+            self.d_angle = self.fov / RAY_COUNT
+            self.vision_range_arc = 7

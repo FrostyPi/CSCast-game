@@ -1,7 +1,7 @@
 import pygame
 from config import *
 import math
-from Bullets import *
+from weapons import *
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, game, groups, obstacles, spawn_pos):
@@ -10,7 +10,7 @@ class Enemy(pygame.sprite.Sprite):
 
         self.x = spawn_pos[0]
         self.y = spawn_pos[1]
-        self.image = pygame.image.load('graphics/rock.png').convert_alpha()
+        self.image = pygame.image.load('graphics/humanities-student-standard-frame.png').convert_alpha()
         self.rect = self.image.get_rect(topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE))
         self.mask = pygame.mask.from_surface(self.image)
         self.hitbox = self.rect.inflate(-10,-10)     
@@ -45,7 +45,7 @@ class Enemy(pygame.sprite.Sprite):
             self.distance = self.knockback_vector.magnitude()
             if self.distance != 0:
                 self.direction = self.knockback_vector.normalize()
-        elif self.move_state == 'seeking vibes':
+        elif self.move_state == 'seeking vibes' or self.move_state == 'vibing':
             difference_vector = self.speaker_difference
             if self.speaker_distance != 0:
                 self.direction = difference_vector.normalize()
@@ -75,6 +75,9 @@ class Enemy(pygame.sprite.Sprite):
 
         self.x = self.rect.x / TILE_SIZE
         self.y = self.rect.y / TILE_SIZE
+
+        angle = math.degrees(math.atan2(-self.direction[1], self.direction[0])) - 90
+        self.rot_image = pygame.transform.rotate(self.image, angle)
         
     def speaker_check(self):
         if self.game.speaker_sprite:
