@@ -23,7 +23,7 @@ class Map(pygame.sprite.Sprite):
                         # self.matrix[y][x] = 1
                 if layer.name == 'Doors':
                     for x, y, surface in layer.tiles():
-                        Tile((x * TILE_SIZE + TILE_SIZE/2, y * TILE_SIZE + TILE_SIZE/2), [self.game.visible_sprites, self.game.obstacle_sprites, self.game.door_sprites], surface = surface.convert_alpha())
+                        Tile((x * TILE_SIZE + TILE_SIZE/2, y * TILE_SIZE + TILE_SIZE/2), [self.game.visible_sprites, self.game.obstacle_sprites, self.game.door_sprites], type = 'door', surface = surface.convert_alpha())
 
 
 

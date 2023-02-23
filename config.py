@@ -18,3 +18,4 @@ VISION_RANGE = 7
 VISION_RANGE_ARC = 6
 
 ENEMY_DRAW_OVERLAP = 300
+UI_FONT = 'graphics/font/arial.ttf'

@@ -33,10 +33,8 @@ class Player(pygame.sprite.Sprite):
         self.speaker_upgrade = False
         self.gun_upgrade = False
         for item in self.game.inventory:
-            print(item)
             if item == "speaker":
                 self.speaker_possession = True
-                print('yes')
             elif item == "flashlight upgrade":
                 self.flashlight_upgrade = True
             elif item == "speaker upgrade":
@@ -48,7 +46,7 @@ class Player(pygame.sprite.Sprite):
         self.right_corridor_key = False
         self.lecture_room_key = False
         self.final_key = False
-        for key in keys:
+        for key in self.game.keys:
             if key == "lecture room":
                 self.right_corridor_key = True
             elif key == "right corridor":
@@ -56,7 +54,8 @@ class Player(pygame.sprite.Sprite):
             elif key == "MCS0001":
                 self.final_key = True
 
-        #speaker possession
+        #covid status
+        self.covid = False
 
     def movement(self):
         
@@ -139,7 +138,7 @@ class Player(pygame.sprite.Sprite):
         # collisions with COVID-positive folk
         for sprite in self.enemy_sprites:
             if self.hitbox.colliderect(sprite.hitbox):
-                    self.game.game_state = 'game over'
+                    self.covid = True
 
     def item_pickup_events(self):
         keys = pygame.key.get_pressed()
@@ -155,8 +154,24 @@ class Player(pygame.sprite.Sprite):
                     if self.rect.colliderect(sprite.rect):
                         sprite.kill()
                         self.inventory_maker()
-                        
-                        #print(self.game.keys)
+    
+    def door_open_events(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_e]:
+            if self.game.door_sprites:
+                if self.game.keys:
+                    for sprite in self.game.door_sprites:
+                        if self.rect.colliderect(sprite.hitbox):
+                            if self.lecture_room_key == True: 
+                                sprite.kill()
+
+                            elif self.right_corridor_key == True: 
+                                sprite.kill()
+
+                            elif self.final_key == True:
+                                self.game.game_state = 'victory'
+                                self.game.visible_sprites.new_draw()
+                                sprite.kill()
 
     def inventory_maker(self):
         #item upgrades
@@ -190,6 +205,8 @@ class Player(pygame.sprite.Sprite):
         self.mouse_inputs()
         self.cooldowns()
         self.item_pickup_events()
+        self.door_open_events()
+   
 
     @property
     def position(self):

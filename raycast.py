@@ -5,16 +5,14 @@ from config import *
 class RayCast(pygame.sprite.Sprite):
     def __init__(self, game):
         self.game = game
-        #self.floor_mask = self.game.floor_mask
         self.image = pygame.Surface((50, 50), pygame.SRCALPHA, 32)
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 
-        #self.flash_light_type = 3
         self.fov = math.pi / 3
         self.half_fov = self.fov / 2
         self.d_angle = self.fov / RAY_COUNT
-        self.vision_range_arc = VISION_RANGE_ARC
+        self.vision_range_arc = 6
 
     def ray_cast(self):
         x_player, y_player = self.game.player.position
@@ -26,9 +24,6 @@ class RayCast(pygame.sprite.Sprite):
             ray_angle = ray_angle + self.d_angle
             self.cos_a = math.cos(ray_angle)
             self.sin_a = math.sin(ray_angle)
-
-            flag_1 = False
-            flag_2 = False
 
             #vertical
             if self.cos_a > 0:

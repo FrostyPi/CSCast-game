@@ -6,7 +6,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, player, groups, obstacle_group):
         super().__init__(groups)
         self.image = pygame.image.load('graphics/nerf-bullet.png').convert_alpha()
-        #self.image.fill((255, 0, 0)) 
+    
         
         self.origin = player.rect.center
         self.rect = self.image.get_rect(center = player.rect.center)      
@@ -83,10 +83,19 @@ class PortableSpeaker(pygame.sprite.Sprite):
             
     
     def update(self):
+        if self.player.covid == True:
+            self.audio.stop()
+
         distance_to_player = pygame.math.Vector2(self.player.rect.x  - self.rect.x, self.player.rect.y - self.rect.y).magnitude()
         if distance_to_player != 0:
+            if 0 < distance_to_player <= 10:
+                distance_to_player = 11
+            elif distance_to_player > self.effect_radius + 400:
+                distance_to_player = self.effect_radius
+
             sound_diminisher = (self.effect_radius + 400) / distance_to_player
             self.audio.set_volume(self.base_level * sound_diminisher)
+        
         elif distance_to_player >= 256:
             self.audio.set_volume(0)
         else:
@@ -99,12 +108,3 @@ class PortableSpeaker(pygame.sprite.Sprite):
         else:
             self.time_so_far += self.game.time_between_frames
 
-        #self.duration = 
-        #pygame.draw.circle(self.image, (100, 200, 100, [32]), (self.rect.x, self.rect.y), self.effect_radius)
-
-    
-    #def update(self):
-
-
-        # increased radius with higher ps_level?
-        #self.level = player.ps_level
