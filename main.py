@@ -91,7 +91,7 @@ class Game:
         self.map = Map(self)
 
 
-        #should definitely put all of this into a hashmap and iterate through it
+        #should DEFINITELY put all of this into a hashmap and iterate through it
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (0, 0))
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (21, 2))
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (25, 2))
