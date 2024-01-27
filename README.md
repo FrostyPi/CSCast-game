@@ -4,6 +4,7 @@ First game I made that wasn't a flappy bird clone.
 Felt like a genius when I increased the spread between each raycast line, and drew a transparent polygon surface over it, and applied a mask to said surface in order to detect objects via collision. PRobably not that impressive :(
 
 Need to work on my art/sound skills with Aseprite/Audacity. Complete garbo
+
 Game also needs UI/Instructions but I am not currently psyched
 
 ![](https://github.com/FrostyPi/CSCast-game/blob/main/cscast_gif.gif)
