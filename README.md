@@ -12,8 +12,10 @@ Game also needs UI/Instructions but I am not currently psyched
 Overall very fun project to make, much more fun than actually playing the game. 
 
 
-python version 3.10.9
+python version 3.10.9 
+
 pygame version 2.1.2
+
 pytmx version 3.31
 
 run game by running "python main.py" in this directory, without the quotation marks
