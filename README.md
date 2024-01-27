@@ -6,7 +6,7 @@ Felt like a genius when I increased the spread between each raycast line, and dr
 Need to work on my art/sound skills with Aseprite/Audacity. Complete garbo
 Game also needs UI/Instructions but I am not currently psyched
 
-
+![](https://github.com/FrostyPi/CSCast-game/blob/main/cscast_gif.gif)
 
 Overall very fun project to make, much more fun than actually playing the game. 
 
