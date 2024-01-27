@@ -90,6 +90,8 @@ class Game:
         self.tmx_data = load_pygame('graphics/tiled_map/floor-two.tmx')
         self.map = Map(self)
 
+
+        #should definitely put all of this into a hashmap and iterate through it
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (0, 0))
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (21, 2))
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (25, 2))
@@ -100,7 +102,6 @@ class Game:
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (5, 40))
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (5, 46))
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (4, 52))
-
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (19, 51.5))
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (26, 50))
         self.enemy = Enemy(self, [self.visible_sprites, self.enemy_sprites], self.obstacle_sprites, (3, 5))
