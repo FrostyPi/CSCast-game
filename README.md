@@ -12,9 +12,6 @@ Game also needs UI/Instructions but I am not currently psyched
 Overall very fun project to make, much more fun than actually playing the game. 
 
 
-
-GIF of game:
-
 python version 3.10.9
 pygame version 2.1.2
 pytmx version 3.31
